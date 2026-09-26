@@ -6,7 +6,7 @@ into a Squarespace page.
 
 - `index.html`: standalone preview of the whole thing
 - `embed/imagine-scroll.js`, `embed/imagine-scroll.css`: the player and island (the CSS is loaded automatically)
-- `frames/desktop`, `frames/mobile`: the video as 247 WebP frames (16:9 for desktop, a 9:16 crop for phones)
+- `frames/desktop`, `frames/mobile`: the video as 247 full-1080p WebP frames (1920×1080 for desktop, a 608×1080 crop for phones)
 - `assets/logo.png`: logo cut out of the mockup
 - `squarespace/`: ready-to-paste snippets
 - `tools/build-frames.sh`: regenerates the frames from a new video
@@ -41,7 +41,7 @@ Everything is set in `window.IMAGINE_SCROLL` inside the snippet:
 |---|---|
 | `nav` | Island buttons: `label`, `href`, optional `short` label for very small phones, `newTab: true` to open in a new tab |
 | `mapUrl` | Where the map pin (and "Get directions") links |
-| `copy` | Caption text for `hero`, `net`, `splash`, `party`, `gallery`, `glow`, `draw`, `visit` (`label`, `title`, `body`) |
+| `copy` | Caption text for `hero`, `net`, `splash`, `party`, `gallery`, `glow`, `draw`, `visit` (`label`, `title`, `body`, optional `color`) |
 | `hideSiteHeader` | `true` hides Squarespace's header on that page so the island is the header |
 | `logo` | URL of a sharper logo file (upload it to Squarespace and paste the image URL) |
 | `scrollLength` | How much scrolling the whole video takes (default `650`). Bigger = slower |

@@ -30,9 +30,9 @@
     logoAlt: 'Imagine Minds play center',
     logoLink: '/',
     nav: [
-      { label: 'Tickets', href: '/tickets' },
-      { label: 'Membership', href: '/membership' },
-      { label: 'Birthday Party', short: 'Party', href: '/birthday-party' }
+      { label: 'Tickets', href: 'https://ecom.roller.app/imagineminds/checkout/en-us/home' },
+      { label: 'Membership', href: 'https://www.imagine-minds.com/membership' },
+      { label: 'Birthday Party', short: 'Party', href: 'https://www.imagine-minds.com/birthday-parties' }
     ],
     mapUrl: 'https://www.google.com/maps/search/?api=1&query=Imagine+Minds+Play+Center',
     mapLabel: 'Find us on Google Maps',
@@ -109,6 +109,7 @@
         num: '05',
         label: 'Glow Room',
         title: 'Glow, push, wonder',
+        color: '#ff7a2f',
         body: 'Giant glowing spheres under a sky of projected stars. Push them, hug them, chase them.'
       },
       draw: {
@@ -417,11 +418,9 @@
     var canvas = el('canvas', { class: 'imx__canvas', 'aria-hidden': 'true' });
     var ctx = canvas.getContext('2d', { alpha: false });
     var scrimTop = el('div', { class: 'imx__scrim imx__scrim--top' });
-    var scrimBottom = el('div', { class: 'imx__scrim imx__scrim--bottom' });
     var loadBar = el('div', { class: 'imx__load' });
     stage.appendChild(canvas);
     stage.appendChild(scrimTop);
-    stage.appendChild(scrimBottom);
     if (cfg.sideLabel) stage.appendChild(el('div', { class: 'imx__side', 'aria-hidden': 'true', text: cfg.sideLabel }));
 
     // Timeline → cumulative scroll weights
@@ -614,7 +613,6 @@
       wantFrame = clamp(Math.round(timeAt(x) * fps), 0, frameCount - 1);
       draw();
 
-      var maxOp = 0;
       caps.forEach(function (c) {
         var lp = (x - c.seg.start) / c.seg.w;
         var op;
@@ -626,10 +624,8 @@
         c.node.style.transform = 'translate3d(0,' + shift.toFixed(1) + 'px,0)';
         c.node.classList.toggle('is-live', op > 0.001);
         c.node.classList.toggle('is-interactive', c.interactive && op > 0.6);
-        if (op > maxOp) maxOp = op;
       });
 
-      scrimBottom.style.opacity = (0.3 + 0.7 * maxOp).toFixed(3);
       railFills.forEach(function (r) {
         r.node.style.transform = 'scaleX(' + clamp((x - r.seg.start) / r.seg.w, 0, 1).toFixed(4) + ')';
       });
@@ -721,7 +717,10 @@
       side.appendChild(actions);
     }
 
-    return el('div', { class: 'imx-cap imx-cap--' + type }, [head, side]);
+    var node = el('div', { class: 'imx-cap imx-cap--' + type }, [head, side]);
+    // Optional per-caption text colour, e.g. a brighter orange over a dark scene.
+    if (copy.color) node.style.setProperty('--imx-text', copy.color);
+    return node;
   }
 
   // ---------------------------------------------------------------------------
