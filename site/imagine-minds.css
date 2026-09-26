@@ -135,12 +135,6 @@
 
 .imm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
-.imm-shade {
-  position: absolute; inset: 0; pointer-events: none;
-  background:
-    linear-gradient(to top, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.28) 34%, rgba(0, 0, 0, 0) 58%),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 26%);
-}
 
 /* keep bottom UI above the mobile toolbar */
 .imm-bottom {
@@ -162,7 +156,8 @@
   max-width: 36rem;
   opacity: 0;
   visibility: hidden;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+  /* shadow on the letters only (no overlay on the video) so white text reads on bright scenes */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 2px 16px rgba(0, 0, 0, 0.35);
 }
 .imm-cap.is-active { opacity: 1; visibility: visible; transition: opacity 0.4s ease; }
 .imm-cap-kicker {
@@ -182,8 +177,10 @@
   margin-top: 12px;
   max-width: 30rem;
   font-size: clamp(1rem, 0.5vw + 0.8rem, 1.25rem);
+  font-weight: 600;
   line-height: 1.5;
-  color: var(--imm-muted);
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 14px rgba(0, 0, 0, 0.4);
 }
 
 .imm-hint {
@@ -191,6 +188,7 @@
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   transform: translateX(-50%);
   font-size: 14px; font-weight: 600; letter-spacing: 0.04em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 2px 12px rgba(0, 0, 0, 0.35);
   transition: opacity 0.35s ease;
 }
 .imm-hint svg { width: 22px; height: 22px; animation: imm-bob 1.6s var(--imm-ease-out) infinite; }

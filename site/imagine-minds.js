@@ -129,7 +129,6 @@
       '<section class="imm-scrub" aria-label="Virtual tour">' +
       '<div class="imm-stage">' +
       '<canvas class="imm-canvas" role="img" aria-label="' + esc(cfg.tourLabel) + '"></canvas>' +
-      '<div class="imm-shade"></div>' +
       '<div class="imm-bottom">' +
       '<div class="imm-captions">' + caps + "</div>" +
       '<div class="imm-hint" aria-hidden="true">Scroll to explore' + CHEVRON_SVG + "</div>" +
