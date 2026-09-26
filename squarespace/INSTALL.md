@@ -26,9 +26,9 @@ Edit the `IMM_CONFIG` block in the snippet:
 ```js
 window.IMM_CONFIG = {
   links: {
-    tickets: "/tickets",            // or a full booking URL
-    membership: "/membership",
-    party: "/birthday-party"
+    tickets: "https://ecom.roller.app/imagineminds/checkout/en-us/home",
+    membership: "https://www.imagine-minds.com/membership",
+    party: "https://www.imagine-minds.com/birthday-parties"
   },
   mapsUrl: "https://maps.app.goo.gl/…"   // Google Maps → your place → Share → Copy link
 };
@@ -62,7 +62,7 @@ captions: [
 
 ## Updating the site later
 
-The snippet points at one exact commit (`@e74fa39…`), so it never changes by surprise. After changing anything in `site/`, push it, then swap the commit hash in both jsDelivr URLs in the snippet for the new one.
+The snippet points at one exact commit (`@87b2f4c…`), so it never changes by surprise. After changing anything in `site/`, push it, then swap the commit hash in both jsDelivr URLs in the snippet for the new one.
 
 To use a different video, run `scripts/extract-frames.sh your-video.mp4` (it needs ffmpeg), then set `frameCount` to the number it prints.
 
