@@ -45,6 +45,8 @@ Add any of these to `IMM_CONFIG`:
 | `outro` | `{ title, text }` | The "Ready to play?" block after the tour. |
 | `hideSquarespaceHeader` | `true` | Set to `false` to keep the Squarespace header. |
 | `homeUrl` | `"/"` | The page the logo links to. |
+| `tourPaths` | `["/"]` | Pages that show the tour. All other pages load normally, so the code is safe even in the site-wide header. |
+| `newTab` | `{ tickets: true }` | Which buttons open in a new tab, e.g. `{ tickets: true, party: true }`. |
 | `frameCount` | `309` | Number of frames. Change it only after re-extracting frames from a new video. |
 
 Example: change the caption text.
@@ -62,7 +64,7 @@ captions: [
 
 ## Updating the site later
 
-The snippet points at one exact commit (`@c719c3f…`), so it never changes by surprise. After changing anything in `site/`, push it, then swap the commit hash in both jsDelivr URLs in the snippet for the new one.
+The snippet points at one exact commit (`@fa1f8a8…`), so it never changes by surprise. After changing anything in `site/`, push it, then swap the commit hash in both jsDelivr URLs in the snippet for the new one.
 
 To use a different video, run `scripts/extract-frames.sh your-video.mp4` (it needs ffmpeg), then set `frameCount` to the number it prints.
 
