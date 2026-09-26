@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Imagine Minds — Play Center</title>
+  <meta name="description" content="Climb, splash, glow and draw at Imagine Minds Play Center.">
+  <meta name="theme-color" content="#100904">
+  <link rel="preload" as="image" href="frames/desktop/0001.webp" media="(min-aspect-ratio: 4/5)">
+  <link rel="preload" as="image" href="frames/mobile/0001.webp" media="(max-aspect-ratio: 4/5)">
+  <link rel="stylesheet" href="embed/imagine-scroll.css">
+  <style>
+    html, body { margin: 0; background: #100904; color: #ffedd7; }
+    body { font-family: "Manrope", ui-sans-serif, system-ui, sans-serif; }
+
+    /* A stand-in for the rest of the Squarespace page, in the same void-mode style. */
+    .after {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      column-gap: 18px;
+      align-content: center;
+      padding: 120px clamp(16px, 2.4vw, 36px);
+      border-top: 1px dashed #40372e;
+    }
+    .after h2 {
+      margin: 0;
+      font-size: clamp(34px, 4.4vw, 64px);
+      line-height: 0.9;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .after p {
+      margin: 0;
+      padding-top: 16px;
+      border-top: 1px dashed #6c5f51;
+      font-size: clamp(17px, 1.55vw, 24px);
+      line-height: 1.26;
+    }
+    .after footer {
+      grid-column: 1 / -1;
+      margin-top: 96px;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+    @media (max-width: 760px) {
+      .after { grid-template-columns: minmax(0, 1fr); row-gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="imagine-scroll"></div>
+
+  <section class="after">
+    <h2>Every visit is a new adventure.</h2>
+    <p>Your Squarespace content continues here: hours, prices, FAQs and anything else you add below the video.</p>
+    <footer>© Imagine Minds Play Center</footer>
+  </section>
+
+  <script>
+    window.IMAGINE_SCROLL = {
+      // Links used by the island and the final "Come play" frame.
+      nav: [
+        { label: "Tickets", href: "#tickets" },
+        { label: "Membership", href: "#membership" },
+        { label: "Birthday Party", short: "Party", href: "#birthday-party" }
+      ],
+      logoLink: "#"
+    };
+  </script>
+  <script src="embed/imagine-scroll.js" defer></script>
+</body>
+</html>

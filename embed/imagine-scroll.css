@@ -1,0 +1,538 @@
+/*
+ * Imagine Minds — scroll-driven video + button island.
+ * Everything is scoped under .imx / .imx-island so it can live inside Squarespace
+ * without touching the site's own styles.
+ */
+
+.imx,
+.imx-island {
+  --imx-walnut: #100904;
+  --imx-cream: #ffedd7;
+  --imx-bark: #382416;
+  --imx-cork: #40372e;
+  --imx-driftwood: #6c5f51;
+  --imx-ember: #dc5000;
+  --imx-red: #d83c3c;
+  --imx-red-hover: #c22f2f;
+  --imx-font: "Manrope", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --imx-gutter: clamp(16px, 2.4vw, 36px);
+  --imx-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Scroll stage                                                        */
+/* ------------------------------------------------------------------ */
+
+.imx {
+  position: relative;
+  display: block;
+  background: var(--imx-walnut);
+  color: var(--imx-cream);
+  font-family: var(--imx-font);
+  font-feature-settings: "ss01" on;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+  /* height is set by JS from the timeline length */
+}
+
+.imx *,
+.imx *::before,
+.imx *::after {
+  box-sizing: border-box;
+}
+
+.imx__stage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--imx-walnut);
+}
+
+/* JS fallback when a parent breaks position: sticky */
+.imx--js-pin .imx__stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+.imx__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.imx__scrim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.imx__scrim--top {
+  top: 0;
+  height: 220px;
+  background: linear-gradient(to bottom, rgba(16, 9, 4, 0.55), rgba(16, 9, 4, 0));
+}
+
+.imx__scrim--bottom {
+  bottom: 0;
+  height: 62%;
+  background: linear-gradient(
+    to top,
+    rgba(16, 9, 4, 0.92) 0%,
+    rgba(16, 9, 4, 0.7) 32%,
+    rgba(16, 9, 4, 0.25) 68%,
+    rgba(16, 9, 4, 0) 100%
+  );
+  opacity: 0.35;
+}
+
+/* Loading bar (top edge, fades out when every frame is in) */
+.imx__load {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: var(--imx-cream);
+  opacity: 0.8;
+  transition: opacity 0.6s ease, transform 0.2s linear;
+  pointer-events: none;
+}
+
+.imx__load.is-done {
+  opacity: 0;
+}
+
+/* Vertical edge label */
+.imx__side {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--imx-gutter) - 4px);
+  transform: translate(50%, -50%) rotate(90deg);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 500;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--imx-cream);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Captions                                                            */
+/* ------------------------------------------------------------------ */
+
+.imx-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 var(--imx-gutter) calc(var(--imx-gutter) + 34px + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  column-gap: 18px;
+  align-items: end;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.imx-cap.is-live {
+  visibility: visible;
+}
+
+.imx-cap.is-interactive {
+  pointer-events: auto;
+}
+
+.imx-cap__eyebrow {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 18px;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.imx-cap__num {
+  color: var(--imx-ember);
+}
+
+.imx-cap__label {
+  opacity: 0.8;
+}
+
+.imx-cap__title {
+  margin: 0;
+  font-size: clamp(38px, 5.4vw, 84px);
+  line-height: 0.9;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  color: var(--imx-cream);
+  text-wrap: balance;
+}
+
+.imx-cap--hero .imx-cap__title {
+  font-size: clamp(44px, 6.4vw, 108px);
+}
+
+.imx-cap__side {
+  justify-self: end;
+  width: min(100%, 440px);
+}
+
+.imx-cap__body {
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(255, 237, 215, 0.38);
+  font-size: clamp(17px, 1.55vw, 24px);
+  line-height: 1.26;
+  font-weight: 400;
+  color: var(--imx-cream);
+  text-wrap: pretty;
+}
+
+/* CTA row inside the final caption */
+.imx-cap__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.imx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 22.5px;
+  border: 1px solid var(--imx-cream);
+  background: transparent;
+  color: var(--imx-cream);
+  font: 500 13px/1 var(--imx-font);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.imx-btn:hover,
+.imx-btn:focus-visible {
+  background: var(--imx-cream);
+  color: var(--imx-walnut);
+}
+
+.imx-btn--filled {
+  border-radius: 36px;
+  background: var(--imx-cream);
+  color: var(--imx-walnut);
+}
+
+.imx-btn--filled:hover,
+.imx-btn--filled:focus-visible {
+  background: var(--imx-bark);
+  border-color: var(--imx-bark);
+  color: var(--imx-cream);
+}
+
+.imx-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--imx-cream);
+  font: 500 13px/1 var(--imx-font);
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 5px;
+}
+
+.imx-link:hover {
+  text-decoration-style: solid;
+}
+
+.imx a:focus-visible,
+.imx-island a:focus-visible {
+  outline: 2px solid var(--imx-cream);
+  outline-offset: 3px;
+}
+
+/* Scroll cue under the opening body copy */
+.imx__cue {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.imx__cue-line {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(var(--imx-cream), rgba(255, 237, 215, 0));
+  transform-origin: top;
+  animation: imx-cue 1.8s var(--imx-ease) infinite;
+}
+
+@keyframes imx-cue {
+  0% { transform: scaleY(0); opacity: 1; }
+  60% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+/* Chapter progress rail */
+.imx__rail {
+  position: absolute;
+  left: var(--imx-gutter);
+  right: var(--imx-gutter);
+  bottom: calc(var(--imx-gutter) + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.imx__rail-seg {
+  position: relative;
+  flex: 1 1 0;
+  height: 2px;
+  background: rgba(255, 237, 215, 0.22);
+  overflow: hidden;
+}
+
+.imx__rail-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--imx-cream);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+
+/* ------------------------------------------------------------------ */
+/* Button island                                                       */
+/* ------------------------------------------------------------------ */
+
+.imx-island {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  transform: translateX(-50%);
+  font-family: var(--imx-font);
+  font-feature-settings: "ss01" on;
+  -webkit-font-smoothing: antialiased;
+  pointer-events: none;
+}
+
+.imx-island * {
+  box-sizing: border-box;
+}
+
+.imx-island__logo {
+  display: block;
+  pointer-events: auto;
+  transition: opacity 0.45s var(--imx-ease), transform 0.55s var(--imx-ease);
+}
+
+.imx-island__logo img {
+  display: block;
+  width: clamp(168px, 16vw, 230px);
+  height: auto;
+}
+
+.imx-island__bar {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1vw, 14px);
+  padding: clamp(5px, 0.6vw, 8px);
+  padding-right: clamp(10px, 1.4vw, 20px);
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 10px 30px -12px rgba(16, 9, 4, 0.45);
+  pointer-events: auto;
+  transition: transform 0.55s var(--imx-ease);
+}
+
+.imx-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(38px, 3.3vw, 48px);
+  padding: 0 clamp(12px, 1.5vw, 24px);
+  border-radius: 9999px;
+  background: var(--imx-red);
+  color: #fff;
+  font-size: clamp(14px, 1.25vw, 19px);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, transform 0.2s var(--imx-ease);
+}
+
+.imx-pill:hover {
+  background: var(--imx-red-hover);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.imx-pill:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.imx-island__map {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(30px, 2.8vw, 40px);
+  height: clamp(38px, 3.3vw, 48px);
+  margin-left: 2px;
+  transition: transform 0.2s var(--imx-ease);
+}
+
+.imx-island__map:hover {
+  transform: translateY(-2px);
+}
+
+.imx-island__map svg {
+  display: block;
+  width: 72%;
+  height: auto;
+}
+
+/* Compact state once the visitor starts scrolling: logo tucks away, bar slides up. */
+.imx-island.is-compact .imx-island__logo {
+  opacity: 0;
+  transform: translateY(-40%) scale(0.92);
+  pointer-events: none;
+}
+
+.imx-island.is-compact .imx-island__bar {
+  transform: translateY(calc(-1 * var(--imx-logo-h, 0px) - 8px));
+}
+
+.imx-pill__short {
+  display: none;
+}
+
+@media (max-width: 400px) {
+  .imx-island__bar {
+    gap: 5px;
+    padding: 5px 8px 5px 5px;
+  }
+
+  .imx-pill {
+    height: 36px;
+    padding: 0 11px;
+    font-size: 13.5px;
+  }
+
+  .imx-island__map {
+    width: 26px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 350px) {
+  .imx-pill__full { display: none; }
+  .imx-pill__short { display: inline; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Small screens                                                       */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 760px) {
+  .imx-cap {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 18px;
+  }
+
+  .imx-cap__side {
+    justify-self: start;
+    width: 100%;
+  }
+
+  .imx-cap__title {
+    font-size: clamp(34px, 10vw, 52px);
+  }
+
+  .imx-cap--hero .imx-cap__title {
+    font-size: clamp(40px, 12vw, 64px);
+  }
+
+  .imx-cap__body {
+    font-size: 17px;
+  }
+
+  .imx-cap__eyebrow {
+    margin-bottom: 12px;
+  }
+
+  .imx-cap__actions {
+    gap: 8px;
+  }
+
+  .imx__side {
+    display: none;
+  }
+
+  .imx__scrim--bottom {
+    height: 72%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .imx__cue-line { animation: none; }
+  .imx-island__logo,
+  .imx-island__bar,
+  .imx-pill { transition: none; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Squarespace helpers                                                 */
+/* ------------------------------------------------------------------ */
+
+/* Page option: hide the default Squarespace header so the island is the header. */
+.imx-hide-site-header #header,
+.imx-hide-site-header header.Header,
+.imx-hide-site-header .Mobile-bar {
+  display: none !important;
+}
+
+/* The section that holds a Code Block embed loses its padding so the video sits edge to edge. */
+.imx-host-section,
+.imx-host-section .content-wrapper {
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.imx-host-section .sqs-block.code-block,
+.imx-host-section .sqs-block-content {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
