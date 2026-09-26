@@ -15,6 +15,10 @@
     scrollLength: 7,          // height of the tour in screens (6 screens of scrolling)
     hideSquarespaceHeader: true,
     homeUrl: "/",
+    // The tour only runs on these pages, so the snippet is safe even in the
+    // site-wide header injection. A page with <div id="imm-mount"> always gets it.
+    tourPaths: ["/"],
+    newTab: { tickets: true },
     links: {
       tickets: "https://ecom.roller.app/imagineminds/checkout/en-us/home",
       membership: "https://www.imagine-minds.com/membership",
@@ -40,6 +44,7 @@
   var user = window.IMM_CONFIG || {};
   var cfg = Object.assign({}, DEFAULTS, user);
   cfg.links = Object.assign({}, DEFAULTS.links, user.links || {});
+  cfg.newTab = Object.assign({}, DEFAULTS.newTab, user.newTab || {});
   cfg.outro = Object.assign({}, DEFAULTS.outro, user.outro || {});
 
   var M = window.Motion || null;
@@ -70,12 +75,33 @@
   var CHEVRON_SVG =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
 
+  function button(key, label) {
+    var ext = cfg.newTab[key];
+    return (
+      '<a class="imm-btn" href="' + esc(cfg.links[key]) + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + ">" +
+      label + (ext ? '<span class="imm-sr"> (opens in a new tab)</span>' : "") +
+      "</a>"
+    );
+  }
+
   function buttons() {
     return (
-      '<a class="imm-btn" href="' + esc(cfg.links.tickets) + '">Tickets</a>' +
-      '<a class="imm-btn" href="' + esc(cfg.links.membership) + '">Membership</a>' +
-      '<a class="imm-btn" href="' + esc(cfg.links.party) + '"><span class="imm-long">Birthday Party</span><span class="imm-short">Birthdays</span></a>'
+      button("tickets", "Tickets") +
+      button("membership", "Membership") +
+      button("party", '<span class="imm-long">Birthday Party</span><span class="imm-short">Birthdays</span>')
     );
+  }
+
+  function normPath(p) {
+    p = String(p || "/").toLowerCase().replace(/\/+$/, "");
+    return p || "/";
+  }
+
+  function isTourPage() {
+    if (document.getElementById("imm-mount")) return true;
+    if (cfg.tourPaths === "*") return true;
+    var here = normPath(location.pathname);
+    return [].concat(cfg.tourPaths).some(function (p) { return normPath(p) === here; });
   }
 
   function template() {
@@ -94,7 +120,7 @@
     return (
       '<a class="imm-sr imm-skip" href="#imm-outro">Skip the tour</a>' +
       '<header class="imm-header">' +
-      '<a class="imm-logo" href="' + esc(cfg.homeUrl) + '"><img src="' + BASE + 'assets/logo-sticker.webp" alt="Imagine Minds Play Center" width="1200" height="249" decoding="async" fetchpriority="high"></a>' +
+      '<a class="imm-logo" href="' + esc(cfg.homeUrl) + '"><img src="' + BASE + 'assets/logo-sticker.webp" alt="Imagine Minds Play Center" width="1200" height="250" decoding="async" fetchpriority="high"></a>' +
       '<div class="imm-island-wrap"><nav class="imm-island" aria-label="Main">' +
       buttons() +
       '<a class="imm-map" href="' + esc(cfg.mapsUrl) + '" target="_blank" rel="noopener" aria-label="Get directions on Google Maps">' + PIN_SVG + "</a>" +
@@ -141,7 +167,7 @@
   }
 
   function init() {
-    if (document.getElementById("imm-app")) return;
+    if (document.getElementById("imm-app") || !isTourPage()) return;
 
     var app = document.createElement("div");
     app.id = "imm-app";
@@ -357,6 +383,18 @@
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
+
+    // Coming back from Membership/Party etc.: return to the same spot in the tour
+    var scrollKey = "imm-scroll:" + location.pathname;
+    window.addEventListener("pagehide", function () {
+      try { sessionStorage.setItem(scrollKey, String(Math.round(window.scrollY))); } catch (e) {}
+    });
+    var navEntry = performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
+    if (navEntry && navEntry.type === "back_forward") {
+      var savedY = 0;
+      try { savedY = parseInt(sessionStorage.getItem(scrollKey), 10) || 0; } catch (e) {}
+      if (savedY > 0) window.scrollTo(0, savedY);
+    }
 
     resizeCanvas();
     startLoading();
