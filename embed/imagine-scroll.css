@@ -13,8 +13,8 @@
   --imx-driftwood: #6c5f51;
   --imx-ember: #dc5000;
   --imx-text: var(--imx-ember);
-  --imx-red: #d83c3c;
-  --imx-red-hover: #c22f2f;
+  --imx-red: #ff3434;
+  --imx-red-hover: #e62424;
   --imx-font: "Manrope", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --imx-gutter: clamp(16px, 2.4vw, 36px);
   --imx-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -79,25 +79,6 @@
   top: 0;
   height: 220px;
   background: linear-gradient(to bottom, rgba(16, 9, 4, 0.55), rgba(16, 9, 4, 0));
-}
-
-/* Loading bar (top edge, fades out when every frame is in) */
-.imx__load {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 2px;
-  width: 100%;
-  transform-origin: 0 50%;
-  transform: scaleX(0);
-  background: var(--imx-text);
-  opacity: 0.8;
-  transition: opacity 0.6s ease, transform 0.2s linear;
-  pointer-events: none;
-}
-
-.imx__load.is-done {
-  opacity: 0;
 }
 
 /* Vertical edge label */
@@ -350,19 +331,19 @@
 
 .imx-island__logo img {
   display: block;
-  width: clamp(168px, 16vw, 230px);
+  width: clamp(200px, 19.2vw, 276px);
   height: auto;
 }
 
 .imx-island__bar {
   display: flex;
   align-items: center;
-  gap: clamp(6px, 1vw, 14px);
-  padding: clamp(5px, 0.6vw, 8px);
-  padding-right: clamp(10px, 1.4vw, 20px);
+  gap: clamp(7px, 1.2vw, 17px);
+  padding: clamp(6px, 0.72vw, 10px);
+  padding-right: clamp(12px, 1.68vw, 24px);
   border-radius: 9999px;
   background: #fff;
-  box-shadow: 0 10px 30px -12px rgba(16, 9, 4, 0.45);
+  box-shadow: 0 12px 36px -14px rgba(16, 9, 4, 0.45);
   pointer-events: auto;
   transition: transform 0.55s var(--imx-ease);
 }
@@ -371,12 +352,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: clamp(38px, 3.3vw, 48px);
-  padding: 0 clamp(12px, 1.5vw, 24px);
+  height: clamp(46px, 3.96vw, 58px);
+  padding: 0 clamp(14px, 1.8vw, 29px);
   border-radius: 9999px;
   background: var(--imx-red);
   color: #fff;
-  font-size: clamp(14px, 1.25vw, 19px);
+  font-size: clamp(17px, 1.5vw, 23px);
   font-weight: 500;
   line-height: 1;
   text-decoration: none;
@@ -398,8 +379,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: clamp(30px, 2.8vw, 40px);
-  height: clamp(38px, 3.3vw, 48px);
+  width: clamp(36px, 3.36vw, 48px);
+  height: clamp(46px, 3.96vw, 58px);
   margin-left: 2px;
   transition: transform 0.2s var(--imx-ease);
 }
@@ -429,27 +410,43 @@
   display: none;
 }
 
-@media (max-width: 400px) {
+@media (max-width: 480px) {
+  .imx-island__logo img {
+    width: min(52vw, 230px);
+  }
+
   .imx-island__bar {
-    gap: 5px;
-    padding: 5px 8px 5px 5px;
+    gap: min(1.3vw, 7px);
+    padding: min(1.4vw, 6px) min(2.6vw, 12px) min(1.4vw, 6px) min(1.4vw, 6px);
   }
 
   .imx-pill {
-    height: 36px;
-    padding: 0 11px;
-    font-size: 13.5px;
+    height: min(11vw, 46px);
+    padding: 0 min(3vw, 14px);
+    font-size: min(3.85vw, 17px);
   }
 
   .imx-island__map {
-    width: 26px;
-    height: 36px;
+    width: min(8vw, 36px);
+    height: min(11vw, 46px);
   }
 }
 
+/* Very narrow phones: "Birthday Party" becomes "Party" so the text can stay large. */
 @media (max-width: 350px) {
   .imx-pill__full { display: none; }
   .imx-pill__short { display: inline; }
+
+  .imx-pill {
+    height: 12vw;
+    padding: 0 3.6vw;
+    font-size: 4.5vw;
+  }
+
+  .imx-island__map {
+    width: 8.8vw;
+    height: 12vw;
+  }
 }
 
 /* ------------------------------------------------------------------ */

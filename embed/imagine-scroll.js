@@ -4,10 +4,11 @@
  * Drop-in for Squarespace (Page Header Code Injection or a Code Block) or any page:
  *
  *   <script>window.IMAGINE_SCROLL = { ...options... };</script>
- *   <script src="https://cdn.jsdelivr.net/gh/<user>/<repo>@<ref>/embed/imagine-scroll.js" defer></script>
+ *   <script src="https://cdn.jsdelivr.net/gh/<user>/<repo>@<ref>/embed/imagine-scroll.js"></script>
  *
  * The script loads its own stylesheet and frames from the folder it was served from.
  * It mounts into #imagine-scroll if that element exists, otherwise at the top of the page.
+ * Load it without `defer` in the page header so the intro loader covers the page from the start.
  */
 (function () {
   'use strict';
@@ -15,6 +16,7 @@
   if (window.__imxBooted) return;
   window.__imxBooted = true;
 
+  var startedAt = window.performance && performance.now ? performance.now() : Date.now();
   var script = document.currentScript;
   var user = window.IMAGINE_SCROLL || {};
   var BASE = user.base || (script && script.src ? script.src.replace(/embed\/[^/]*$/, '') : '');
@@ -25,6 +27,11 @@
     island: true,
     hideSiteHeader: false,
     fullBleed: true,
+    // Text overlays (chapter captions, progress line, edge label). Off: the video plays clean.
+    captions: false,
+    // Intro screen with the logo and a progress bar while the first frames download.
+    loader: true,
+    loaderSeconds: 3,
 
     logo: 'assets/logo.png',
     logoAlt: 'Imagine Minds play center',
@@ -58,7 +65,7 @@
     // video, `w` is how much scroll the segment gets. A segment with t[0] === t[1]
     // holds a still frame. Segments with a caption show text while they play.
     timeline: [
-      { t: [0, 0], w: 0.9, id: 'hero' },
+      { t: [0, 0], w: 0.35, id: 'hero' },
       { t: [0, 1.15], w: 1.5, id: 'net' },
       { t: [1.15, 1.8], w: 0.8 },
       { t: [1.8, 3.0], w: 1.5, id: 'splash' },
@@ -70,7 +77,7 @@
       { t: [7.25, 8.8], w: 1.6, id: 'glow' },
       { t: [8.8, 9.0], w: 0.3 },
       { t: [9.0, 10.25], w: 1.4, id: 'draw' },
-      { t: [10.25, 10.25], w: 1.2, id: 'visit' }
+      { t: [10.25, 10.25], w: 0.5, id: 'visit' }
     ],
 
     copy: {
@@ -235,6 +242,96 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Intro loader
+  // ---------------------------------------------------------------------------
+
+  var RED = '#ff3434';
+  var coverStyle = null; // hides the page until the loader is on screen
+  var loaderStyle = null;
+  var loaderEl = null;
+  var stageReady = false;
+  var revealed = false;
+
+  function now() {
+    return window.performance && performance.now ? performance.now() : Date.now();
+  }
+
+  // Runs as soon as the script executes (before <body> exists when loaded in the header),
+  // so visitors never see the page flash before the loader.
+  function coverPage() {
+    coverStyle = el('style', { 'data-imx-cover': '' });
+    coverStyle.textContent =
+      'html{background:#100904!important;overflow:hidden!important}' +
+      'body{visibility:hidden!important}';
+    loaderStyle = el('style', { 'data-imx-loader': '' });
+    loaderStyle.textContent =
+      '.imx-loader{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;' +
+      'align-items:center;justify-content:center;gap:32px;background:#100904;visibility:visible;' +
+      'transition:opacity .6s ease}' +
+      '.imx-loader.is-out{opacity:0;pointer-events:none}' +
+      '.imx-loader img{display:block;width:clamp(220px,24vw,340px);height:auto}' +
+      '.imx-loader__track{width:min(320px,64vw);height:4px;border-radius:4px;' +
+      'background:rgba(255,237,215,.14);overflow:hidden}' +
+      '.imx-loader__fill{height:100%;border-radius:4px;background:' + RED + ';' +
+      'transform-origin:0 50%;transform:scaleX(0)}';
+    document.head.appendChild(coverStyle);
+    document.head.appendChild(loaderStyle);
+    // Never leave the page hidden, whatever happens.
+    setTimeout(reveal, (cfg.loaderSeconds + 4) * 1000);
+  }
+
+  function showLoader() {
+    if (revealed) return;
+    var fill = el('div', { class: 'imx-loader__fill' });
+    loaderEl = el('div', {
+      class: 'imx-loader',
+      role: 'progressbar',
+      'aria-label': 'Loading',
+      'aria-valuemin': '0',
+      'aria-valuemax': '100'
+    }, [
+      el('img', { src: resolve(cfg.logo), alt: cfg.logoAlt }),
+      el('div', { class: 'imx-loader__track' }, [fill])
+    ]);
+    document.body.appendChild(loaderEl);
+
+    var maxMs = cfg.loaderSeconds * 1000;
+    var shown = 0;
+    (function step() {
+      if (revealed) return;
+      var elapsed = now() - startedAt;
+      var loaded = earlyFrames ? earlyFrames.loaded / earlyFrames.count : 0;
+      // The bar fills over `loaderSeconds`, or sooner if every frame arrives first.
+      var p = Math.min(1, Math.max(loaded, elapsed / maxMs));
+      shown += (p - shown) * 0.25;
+      fill.style.transform = 'scaleX(' + shown.toFixed(4) + ')';
+      loaderEl.setAttribute('aria-valuenow', String(Math.round(shown * 100)));
+      var timeUp = elapsed >= maxMs || (loaded >= 1 && elapsed >= 600);
+      if (timeUp && stageReady) return reveal();
+      requestAnimationFrame(step);
+    })();
+  }
+
+  function reveal() {
+    if (revealed) return;
+    revealed = true;
+    if (coverStyle) coverStyle.remove();
+    if (!loaderEl) {
+      if (loaderStyle) loaderStyle.remove();
+      return;
+    }
+    loaderEl.setAttribute('aria-valuenow', '100');
+    loaderEl.querySelector('.imx-loader__fill').style.transform = 'scaleX(1)';
+    requestAnimationFrame(function () {
+      loaderEl.classList.add('is-out');
+      setTimeout(function () {
+        loaderEl.remove();
+        loaderStyle.remove();
+      }, 700);
+    });
+  }
+
+  // ---------------------------------------------------------------------------
   // Island
   // ---------------------------------------------------------------------------
 
@@ -307,6 +404,15 @@
   // Frame loading
   // ---------------------------------------------------------------------------
 
+  // Frames start downloading at DOM ready, before the stylesheet and stage exist.
+  var earlyFrames = null;
+
+  function pickSet() {
+    var w = window.innerWidth;
+    var h = window.innerHeight || 1;
+    return w / h < cfg.frames.mobileBelowAspect ? 'mobile' : 'desktop';
+  }
+
   function Frames(set, onFrame) {
     var f = cfg.frames;
     this.set = set;
@@ -315,7 +421,7 @@
     this.ready = new Uint8Array(f.count);
     this.loaded = 0;
     this.stopped = false;
-    this.onFrame = onFrame;
+    this.onFrame = onFrame || function () {};
 
     // First frame, then progressively finer passes so the whole video is
     // scrubbable (coarsely) within a second or two.
@@ -344,7 +450,7 @@
 
   Frames.prototype.pump = function () {
     var self = this;
-    while (!self.stopped && self.active < 6 && self.queue.length) {
+    while (!self.stopped && self.active < 8 && self.queue.length) {
       (function (i) {
         self.active++;
         var img = new Image();
@@ -418,10 +524,11 @@
     var canvas = el('canvas', { class: 'imx__canvas', 'aria-hidden': 'true' });
     var ctx = canvas.getContext('2d', { alpha: false });
     var scrimTop = el('div', { class: 'imx__scrim imx__scrim--top' });
-    var loadBar = el('div', { class: 'imx__load' });
     stage.appendChild(canvas);
     stage.appendChild(scrimTop);
-    if (cfg.sideLabel) stage.appendChild(el('div', { class: 'imx__side', 'aria-hidden': 'true', text: cfg.sideLabel }));
+    if (cfg.captions && cfg.sideLabel) {
+      stage.appendChild(el('div', { class: 'imx__side', 'aria-hidden': 'true', text: cfg.sideLabel }));
+    }
 
     // Timeline → cumulative scroll weights
     var segs = [];
@@ -436,7 +543,7 @@
     var rail = el('div', { class: 'imx__rail', 'aria-hidden': 'true' });
     var railFills = [];
     segs.forEach(function (seg, idx) {
-      var copy = seg.id && cfg.copy[seg.id];
+      var copy = cfg.captions && seg.id && cfg.copy[seg.id];
       if (!copy) return;
       var type = copy.type || 'chapter';
       var node = buildCaption(copy, type);
@@ -456,7 +563,6 @@
     });
 
     if (railFills.length) stage.appendChild(rail);
-    stage.appendChild(loadBar);
     root.appendChild(stage);
 
     // --- frames -------------------------------------------------------------
@@ -469,16 +575,8 @@
     var drawn = null; // { set, i }
     var dirty = true;
 
-    function pickSet() {
-      var w = window.innerWidth;
-      var h = window.innerHeight || 1;
-      return w / h < cfg.frames.mobileBelowAspect ? 'mobile' : 'desktop';
-    }
-
     function onFrame(owner, i) {
       if (owner !== frames) return;
-      loadBar.style.transform = 'scaleX(' + owner.loaded / owner.count + ')';
-      if (owner.loaded >= owner.count) loadBar.classList.add('is-done');
       var cur = drawn && drawn.set === owner.set ? drawn.i : -1;
       if (cur < 0 || Math.abs(i - wantFrame) < Math.abs(cur - wantFrame)) {
         dirty = true;
@@ -488,11 +586,16 @@
 
     function useSet(set) {
       if (frames && frames.set === set) return;
+      if (!frames && earlyFrames && earlyFrames.set === set) {
+        frames = earlyFrames;
+        frames.onFrame = onFrame;
+        dirty = true;
+        return;
+      }
       if (frames) {
         frames.stopped = true;
         prevFrames = frames;
       }
-      loadBar.classList.remove('is-done');
       frames = new Frames(set, onFrame);
     }
 
@@ -525,7 +628,7 @@
       var h = stage.clientHeight;
       var bw = Math.round(w * dpr);
       var bh = Math.round(h * dpr);
-      var cap = 2560 / Math.max(bw, bh, 1);
+      var cap = 4096 / Math.max(bw, bh, 1);
       if (cap < 1) {
         bw = Math.round(bw * cap);
         bh = Math.round(bh * cap);
@@ -725,12 +828,18 @@
 
   // ---------------------------------------------------------------------------
 
+  var useLoader = cfg.video && cfg.loader;
+  if (useLoader) coverPage();
+  else stageReady = true;
   ensureFonts();
   ready(function () {
+    if (cfg.video) earlyFrames = new Frames(pickSet());
+    if (useLoader) showLoader();
     loadCss(function () {
       if (cfg.hideSiteHeader) document.documentElement.classList.add('imx-hide-site-header');
       if (cfg.island) buildIsland();
       if (cfg.video) buildStage();
+      stageReady = true;
     });
   });
 })();

@@ -16,15 +16,17 @@ OUT="$ROOT/frames"
 rm -rf "$OUT/desktop" "$OUT/mobile"
 mkdir -p "$OUT/desktop" "$OUT/mobile"
 
-# Desktop: full 1080p, ~70 KB per frame.
+# Desktop: full 1080p, ~125 KB per frame. Quality 85 roughly halves the
+# compression error of quality 70 while keeping the whole set near 30 MB
+# (jsDelivr serves GitHub repos up to 50 MB, so leave headroom).
 ffmpeg -hide_banner -loglevel error -i "$SRC" -an \
   -vf "fps=$FPS,scale=1920:1080:flags=lanczos" \
-  -c:v libwebp -quality 70 -compression_level 6 "$OUT/desktop/%04d.webp"
+  -c:v libwebp -quality 85 -preset photo -compression_level 6 "$OUT/desktop/%04d.webp"
 
-# Mobile: centre 9:16 crop at full 1080p height (608x1080), ~25 KB per frame.
+# Mobile: centre 9:16 crop at full 1080p height (608x1080), ~40 KB per frame.
 ffmpeg -hide_banner -loglevel error -i "$SRC" -an \
   -vf "fps=$FPS,crop=ih*9/16:ih,scale=608:1080:flags=lanczos" \
-  -c:v libwebp -quality 70 -compression_level 6 "$OUT/mobile/%04d.webp"
+  -c:v libwebp -quality 88 -preset photo -compression_level 6 "$OUT/mobile/%04d.webp"
 
 echo "desktop: $(ls "$OUT/desktop" | wc -l) frames, $(du -sh "$OUT/desktop" | cut -f1)"
 echo "mobile:  $(ls "$OUT/mobile" | wc -l) frames, $(du -sh "$OUT/mobile" | cut -f1)"

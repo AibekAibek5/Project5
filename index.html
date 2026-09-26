@@ -9,6 +9,13 @@
   <link rel="preload" as="image" href="frames/desktop/0001.webp" media="(min-aspect-ratio: 4/5)">
   <link rel="preload" as="image" href="frames/mobile/0001.webp" media="(max-aspect-ratio: 4/5)">
   <link rel="stylesheet" href="embed/imagine-scroll.css">
+  <!-- Same setup as the Squarespace Page Header snippet: config, then the script (no defer). -->
+  <script>
+    window.IMAGINE_SCROLL = {
+      logoLink: "https://www.imagine-minds.com/"
+    };
+  </script>
+  <script src="embed/imagine-scroll.js"></script>
   <style>
     html, body { margin: 0; background: #100904; color: #ffedd7; }
     body { font-family: "Manrope", ui-sans-serif, system-ui, sans-serif; }
@@ -58,12 +65,5 @@
     <p>Your Squarespace content continues here: hours, prices, FAQs and anything else you add below the video.</p>
     <footer>© Imagine Minds Play Center</footer>
   </section>
-
-  <script>
-    window.IMAGINE_SCROLL = {
-      logoLink: "https://www.imagine-minds.com/"
-    };
-  </script>
-  <script src="embed/imagine-scroll.js" defer></script>
 </body>
 </html>
