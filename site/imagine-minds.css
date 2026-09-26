@@ -2,8 +2,8 @@
    Everything is scoped under .imm so it can live inside a Squarespace page. */
 
 .imm {
-  --imm-red: #d63a3e;          /* 4.63:1 with white text */
-  --imm-red-strong: #b92d31;
+  --imm-red: #ff3434;
+  --imm-red-strong: #e52525;
   --imm-ink: #0b0b0c;
   --imm-paper: #ffffff;
   --imm-muted: rgba(255, 255, 255, 0.84);
@@ -65,8 +65,8 @@
 .imm-island {
   display: flex;
   align-items: center;
-  gap: clamp(6px, 1vw, 16px);
-  padding: 8px;
+  gap: clamp(7px, 1.2vw, 19px);
+  padding: 10px;
   border-radius: 999px;
   background: var(--imm-paper);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.06);
@@ -76,12 +76,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 0 clamp(16px, 1.6vw, 28px);
+  min-height: 58px;
+  padding: 0 clamp(19px, 1.9vw, 34px);
   border-radius: 999px;
   background: var(--imm-red);
   color: #fff !important;
-  font-size: clamp(15px, 0.6vw + 10px, 20px);
+  font-size: clamp(18px, 0.72vw + 12px, 24px);
   font-weight: 500;
   line-height: 1;
   white-space: nowrap;
@@ -89,7 +89,7 @@
   transition: background-color 0.18s ease, transform 0.18s var(--imm-ease-out), box-shadow 0.18s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.imm-btn:hover { background: var(--imm-red-strong); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(214, 58, 62, 0.35); }
+.imm-btn:hover { background: var(--imm-red-strong); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(255, 52, 52, 0.35); }
 .imm-btn:active { transform: scale(0.96); box-shadow: none; }
 .imm-short { display: none; }
 
@@ -97,8 +97,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 58px;
+  height: 58px;
   margin: 0 4px 0 2px;
   border-radius: 999px;
   cursor: pointer;
@@ -106,7 +106,7 @@
 }
 .imm-map:hover { background: #f1f1f3; transform: translateY(-1px); }
 .imm-map:active { transform: scale(0.94); }
-.imm-map svg { width: 30px; height: 30px; display: block; }
+.imm-map svg { width: 36px; height: 36px; display: block; }
 
 .imm a:focus-visible { outline: 3px solid var(--imm-ink); outline-offset: 3px; }
 
@@ -223,7 +223,7 @@
   text-align: center;
   color: var(--imm-ink);
   background:
-    radial-gradient(60% 50% at 50% 0%, rgba(214, 58, 62, 0.08), rgba(214, 58, 62, 0) 70%),
+    radial-gradient(60% 50% at 50% 0%, rgba(255, 52, 52, 0.08), rgba(255, 52, 52, 0) 70%),
     var(--imm-paper);
 }
 .imm-outro h2 {
@@ -264,16 +264,29 @@
   .imm-header.is-compact .imm-island-wrap { transform: translateY(calc(var(--imm-logo-h) * -0.3)); }
 }
 
-@media (max-width: 440px) {
-  .imm-island { gap: 4px; padding: 5px; }
-  .imm-btn { min-height: 44px; padding: 0 13px; font-size: 14px; }
-  .imm-map { width: 44px; height: 44px; margin: 0; }
-  .imm-map svg { width: 26px; height: 26px; }
+/* Island steps down so it always stays on one row */
+@media (max-width: 599px) {
+  .imm-island { gap: 5px; padding: 6px; }
+  .imm-btn { min-height: 52px; padding: 0 14px; font-size: 16px; }
+  .imm-map { width: 52px; height: 52px; margin: 0; }
+  .imm-map svg { width: 30px; height: 30px; }
   .imm-long { display: none; }
   .imm-short { display: inline; }
 }
-@media (max-width: 350px) {
-  .imm-btn { padding: 0 10px; font-size: 13px; }
+@media (max-width: 440px) {
+  .imm-island { gap: 4px; padding: 5px; }
+  .imm-btn { min-height: 50px; padding: 0 11px; font-size: 15px; }
+  .imm-map { width: 48px; height: 48px; }
+  .imm-map svg { width: 28px; height: 28px; }
+}
+@media (max-width: 380px) {
+  .imm-btn { min-height: 48px; padding: 0 10px; font-size: 14px; }
+  .imm-map { width: 44px; height: 44px; }
+  .imm-map svg { width: 26px; height: 26px; }
+}
+@media (max-width: 340px) {
+  .imm-btn { padding: 0 8px; font-size: 13px; }
+  .imm-map { width: 40px; height: 40px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
