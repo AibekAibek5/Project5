@@ -9,9 +9,9 @@ FPS="${FPS:-30}"
 rm -rf "$OUT/desktop" "$OUT/mobile"
 mkdir -p "$OUT/desktop" "$OUT/mobile"
 # 16:9 for landscape screens
-ffmpeg -v error -i "$VIDEO" -vf "fps=$FPS,scale=1280:720:flags=lanczos" \
-  -c:v libwebp -quality 70 -compression_level 6 "$OUT/desktop/f%04d.webp"
+ffmpeg -v error -i "$VIDEO" -vf "fps=$FPS,scale=1920:1080:flags=lanczos" \
+  -c:v libwebp -quality 80 -compression_level 6 "$OUT/desktop/f%04d.webp"
 # centre 9:16 crop for phones held upright
-ffmpeg -v error -i "$VIDEO" -vf "fps=$FPS,crop=ih*9/16:ih,scale=576:1024:flags=lanczos" \
-  -c:v libwebp -quality 66 -compression_level 6 "$OUT/mobile/f%04d.webp"
+ffmpeg -v error -i "$VIDEO" -vf "fps=$FPS,crop=ih*9/16:ih" \
+  -c:v libwebp -quality 80 -compression_level 6 "$OUT/mobile/f%04d.webp"
 echo "frameCount: $(ls "$OUT/desktop" | wc -l)"

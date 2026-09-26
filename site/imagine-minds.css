@@ -109,7 +109,6 @@
 .imm-map svg { width: 30px; height: 30px; display: block; }
 
 .imm a:focus-visible { outline: 3px solid var(--imm-ink); outline-offset: 3px; }
-.imm-outro a:focus-visible { outline-color: var(--imm-paper); }
 
 /* Compact state once the visitor starts scrolling */
 .imm-header.is-compact .imm-logo { transform: scale(0.58); }
@@ -222,9 +221,10 @@
   position: relative;
   padding: clamp(88px, 16vh, 180px) 16px clamp(72px, 12vh, 140px);
   text-align: center;
+  color: var(--imm-ink);
   background:
-    radial-gradient(60% 50% at 50% 0%, rgba(214, 58, 62, 0.28), rgba(214, 58, 62, 0) 70%),
-    #000;
+    radial-gradient(60% 50% at 50% 0%, rgba(214, 58, 62, 0.08), rgba(214, 58, 62, 0) 70%),
+    var(--imm-paper);
 }
 .imm-outro h2 {
   font-size: clamp(2.4rem, 6vw, 5.25rem);
@@ -237,14 +237,14 @@
   margin: 16px auto 0;
   font-size: clamp(1rem, 0.6vw + 0.8rem, 1.25rem);
   line-height: 1.55;
-  color: var(--imm-muted);
+  color: #4a4a52;               /* 8.8:1 on white */
 }
 .imm-outro-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 32px; }
 .imm-outro .imm-btn { min-height: 52px; font-size: 17px; padding: 0 28px; }
 .imm-directions {
   display: inline-flex; align-items: center; gap: 10px;
   min-height: 44px; margin-top: 20px; padding: 0 12px;
-  font-weight: 600; color: var(--imm-paper);
+  font-weight: 600; color: var(--imm-ink);
   text-decoration: underline !important; text-underline-offset: 4px; text-decoration-thickness: 1px;
 }
 .imm-directions svg { width: 22px; height: 22px; }

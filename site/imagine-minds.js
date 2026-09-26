@@ -16,9 +16,9 @@
     hideSquarespaceHeader: true,
     homeUrl: "/",
     links: {
-      tickets: "/tickets",
-      membership: "/membership",
-      party: "/birthday-party"
+      tickets: "https://ecom.roller.app/imagineminds/checkout/en-us/home",
+      membership: "https://www.imagine-minds.com/membership",
+      party: "https://www.imagine-minds.com/birthday-parties"
     },
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Imagine+Minds+Play+Center",
     tourLabel: "A walk through Imagine Minds Play Center: a rainbow climbing net, play stations, a birthday party room, a gallery, a glow room and a drawing studio.",
