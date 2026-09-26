@@ -24,6 +24,9 @@
   var DEFAULTS = {
     mount: '#imagine-scroll',
     video: true,
+    // Paths that show the video, e.g. ['/']. By default it shows wherever the script runs,
+    // except on the pages the island buttons link to.
+    videoPages: null,
     island: true,
     hideSiteHeader: false,
     fullBleed: true,
@@ -37,7 +40,7 @@
     logoAlt: 'Imagine Minds play center',
     logoLink: '/',
     nav: [
-      { label: 'Tickets', href: 'https://ecom.roller.app/imagineminds/checkout/en-us/home' },
+      { label: 'Tickets', href: 'https://ecom.roller.app/imagineminds/checkout/en-us/home', newTab: true },
       { label: 'Membership', href: 'https://www.imagine-minds.com/membership' },
       { label: 'Birthday Party', short: 'Party', href: 'https://www.imagine-minds.com/birthday-parties' }
     ],
@@ -136,6 +139,66 @@
   };
 
   var cfg = merge(DEFAULTS, user);
+
+  // ---------------------------------------------------------------------------
+  // Where the video runs, and visitors coming back
+  // ---------------------------------------------------------------------------
+
+  function cleanPath(p) {
+    return (p || '/').replace(/\/+$/, '') || '/';
+  }
+
+  // Does `href` point at the page we're on? Ignores "www." and trailing slashes; on a
+  // *.squarespace.com preview address only the path is compared.
+  function isCurrentPage(href) {
+    try {
+      var u = new URL(href, location.href);
+      var host = location.hostname.replace(/^www\./, '');
+      var sameHost = u.hostname.replace(/^www\./, '') === host || /\.squarespace\.com$/.test(host);
+      return sameHost && cleanPath(u.pathname) === cleanPath(location.pathname);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function videoAllowedHere() {
+    var here = cleanPath(location.pathname);
+    if (cfg.videoPages) {
+      return cfg.videoPages.some(function (p) {
+        return cleanPath(p) === here;
+      });
+    }
+    // Membership / Birthday Party pages open straight on their own content, not the tour.
+    return !cfg.nav.some(function (item) {
+      return isCurrentPage(item.href);
+    });
+  }
+
+  if (!videoAllowedHere()) cfg.video = false;
+
+  // Back/forward and reload: the frames are already cached, so skip the intro loader and
+  // put the visitor back where they were instead of at the start of the tour.
+  var navType = 'navigate';
+  try {
+    var navEntry = performance.getEntriesByType('navigation')[0];
+    if (navEntry) navType = navEntry.type;
+  } catch (e) {}
+  var returning = navType === 'back_forward' || navType === 'reload';
+  var SCROLL_KEY = 'imx-scroll:' + location.pathname;
+
+  function savedScroll() {
+    try {
+      return parseFloat(sessionStorage.getItem(SCROLL_KEY)) || 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  window.addEventListener('pagehide', function () {
+    try {
+      sessionStorage.setItem(SCROLL_KEY, String(window.scrollY || window.pageYOffset || 0));
+    } catch (e) {}
+  });
 
   // ---------------------------------------------------------------------------
   // Helpers
@@ -773,6 +836,10 @@
     measure();
     sizeCanvas();
     useSet(pickSet());
+    if (returning) {
+      var y = savedScroll();
+      if (y > 0 && Math.abs((window.scrollY || window.pageYOffset) - y) > 2) window.scrollTo(0, y);
+    }
     readScroll();
     current = target;
     render(current);
@@ -812,7 +879,12 @@
     if (type === 'cta') {
       var actions = el('div', { class: 'imx-cap__actions' });
       cfg.nav.forEach(function (item, i) {
-        actions.appendChild(el('a', { class: 'imx-btn' + (i === 0 ? ' imx-btn--filled' : ''), href: item.href, text: item.label }));
+        var btn = el('a', { class: 'imx-btn' + (i === 0 ? ' imx-btn--filled' : ''), href: item.href, text: item.label });
+        if (item.newTab) {
+          btn.target = '_blank';
+          btn.rel = 'noopener';
+        }
+        actions.appendChild(btn);
       });
       if (cfg.mapUrl && copy.directions) {
         actions.appendChild(el('a', { class: 'imx-link', href: cfg.mapUrl, target: '_blank', rel: 'noopener', text: copy.directions }));
@@ -828,7 +900,7 @@
 
   // ---------------------------------------------------------------------------
 
-  var useLoader = cfg.video && cfg.loader;
+  var useLoader = cfg.video && cfg.loader && !returning;
   if (useLoader) coverPage();
   else stageReady = true;
   ensureFonts();

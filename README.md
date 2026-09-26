@@ -43,6 +43,7 @@ Everything is set in `window.IMAGINE_SCROLL` inside the snippet:
 | `mapUrl` | Where the map pin (and "Get directions") links |
 | `captions` | `true` shows text over the video for each room (off by default). If you turn it on, give the first and last timeline segments more scroll (`w`) so the text has time to read |
 | `copy` | Caption text for `hero`, `net`, `splash`, `party`, `gallery`, `glow`, `draw`, `visit` (`label`, `title`, `body`, optional `color`) |
+| `videoPages` | Paths that show the video, e.g. `["/"]`. By default it shows wherever the script runs, except on the pages the island buttons link to |
 | `hideSiteHeader` | `true` hides Squarespace's header on that page so the island is the header |
 | `logo` | URL of a sharper logo file (upload it to Squarespace and paste the image URL) |
 | `scrollLength` | How much scrolling the whole video takes (default `650`). Bigger = slower |
