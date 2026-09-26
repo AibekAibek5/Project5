@@ -1,0 +1,33 @@
+<!--
+  Imagine Minds: scroll video tour + button island
+  Paste into: Pages → (your page) → ⚙ Settings → Advanced → Page Header Code Injection
+  The video appears at the very top of the page; anything you add to the page shows below it.
+-->
+<script>
+  window.IMAGINE_SCROLL = {
+    // Hide Squarespace's own header on this page, since the island replaces it.
+    // Set to false to keep your regular Squarespace menu as well.
+    hideSiteHeader: true,
+
+    // Island buttons: put your real page URLs in href.
+    nav: [
+      { label: "Tickets",        href: "/tickets" },
+      { label: "Membership",     href: "/membership" },
+      { label: "Birthday Party", href: "/birthday-party", short: "Party" }
+    ],
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=Imagine+Minds+Play+Center",
+
+    // Caption text: edit freely.
+    copy: {
+      hero:    { title: "A playground for big imaginations", body: "Climb, splash, glow and draw at a play center built for curious kids." },
+      net:     { label: "The Net",          title: "Climb above it all",           body: "A giant rainbow net to climb, bounce and crawl across, high above the floor." },
+      splash:  { label: "Splash Zone",      title: "Pour, splash, discover",       body: "Water tables, pumps and bubbles turn cause and effect into the best kind of mess." },
+      party:   { label: "Birthday Parties", title: "Birthdays, beautifully done",  body: "Private party rooms styled around your child’s theme, so you can simply enjoy the day." },
+      gallery: { label: "The Gallery",      title: "Play through the ages",        body: "A hallway of classic controllers and framed art. A little nostalgia for the grown-ups." },
+      glow:    { label: "Glow Room",        title: "Glow, push, wonder",           body: "Giant glowing spheres under a sky of projected stars. Push them, hug them, chase them." },
+      draw:    { label: "Draw & Clean",     title: "Draw on everything",           body: "Walls, tables, even the car. Doodle anywhere, wipe it clean, start again." },
+      visit:   { label: "Plan your visit",  title: "Come play",                    body: "Book a visit, become a member or plan the party of the year." }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/gh/AibekAibek5/Project5@b748500fcc93e8583d2d8c59ab18a80cfcd1b7c8/embed/imagine-scroll.js" defer></script>
