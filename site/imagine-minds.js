@@ -34,18 +34,13 @@
       { from: 0.53, to: 0.64, kicker: "Discover", title: "A gallery of play", text: "Art, toys and surprises around every corner." },
       { from: 0.69, to: 0.85, kicker: "Glow", title: "Light up the room", text: "Giant glowing spheres in a sea of sparkling light." },
       { from: 0.89, to: 0.985, kicker: "Create", title: "Draw & clean", text: "Draw it, wipe it, draw it again." }
-    ],
-    outro: {
-      title: "Ready to play?",
-      text: "Book tickets, become a member or plan an unforgettable birthday."
-    }
+    ]
   };
 
   var user = window.IMM_CONFIG || {};
   var cfg = Object.assign({}, DEFAULTS, user);
   cfg.links = Object.assign({}, DEFAULTS.links, user.links || {});
   cfg.newTab = Object.assign({}, DEFAULTS.newTab, user.newTab || {});
-  cfg.outro = Object.assign({}, DEFAULTS.outro, user.outro || {});
 
   var M = window.Motion || null;
   var reduceMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -118,7 +113,7 @@
       .join("");
 
     return (
-      '<a class="imm-sr imm-skip" href="#imm-outro">Skip the tour</a>' +
+      '<a class="imm-sr imm-skip" href="#imm-end">Skip the tour</a>' +
       '<header class="imm-header">' +
       '<a class="imm-logo" href="' + esc(cfg.homeUrl) + '"><img src="' + BASE + 'assets/logo-sticker.webp" alt="Imagine Minds Play Center" width="1200" height="250" decoding="async" fetchpriority="high"></a>' +
       '<div class="imm-island-wrap"><nav class="imm-island" aria-label="Main">' +
@@ -137,12 +132,7 @@
       "</div>" +
       "</div>" +
       "</section>" +
-      '<section class="imm-outro" id="imm-outro">' +
-      '<h2 class="imm-reveal">' + esc(cfg.outro.title) + "</h2>" +
-      '<p class="imm-reveal">' + esc(cfg.outro.text) + "</p>" +
-      '<div class="imm-outro-actions imm-reveal">' + buttons() + "</div>" +
-      '<a class="imm-directions imm-reveal" href="' + esc(cfg.mapsUrl) + '" target="_blank" rel="noopener">' + PIN_SVG + "Get directions</a>" +
-      "</section>"
+      '<div id="imm-end" tabindex="-1"></div>'
     );
   }
 
@@ -188,7 +178,6 @@
     var hint = app.querySelector(".imm-hint");
     var bar = app.querySelector(".imm-progress span");
     var loadingEl = app.querySelector(".imm-loading");
-    var outro = app.querySelector(".imm-outro");
 
     /* ---------- entrance ---------- */
     if (M && !reduced()) {
@@ -196,13 +185,6 @@
       M.animate(island, { opacity: [0, 1], y: [-18, 0], scale: [0.9, 1] }, { type: "spring", stiffness: 320, damping: 24, delay: 0.12 });
       // opacity only: the buttons' own hover/press transforms live in CSS
       M.animate(island.children, { opacity: [0, 1] }, { duration: 0.45, ease: EASE, delay: M.stagger(0.06, { startDelay: 0.22 }) });
-      M.inView(
-        outro,
-        function () {
-          M.animate(outro.querySelectorAll(".imm-reveal"), { opacity: [0, 1], y: [28, 0] }, { duration: 0.7, ease: EASE, delay: M.stagger(0.09) });
-        },
-        { amount: 0.3 }
-      );
     }
 
     /* ---------- frames ---------- */
