@@ -5,7 +5,7 @@
 set -euo pipefail
 VIDEO="${1:?usage: $0 video.mp4}"
 OUT="$(dirname "$0")/../site/frames"
-FPS="${FPS:-30}"
+FPS="${FPS:-20}"
 rm -rf "$OUT/desktop" "$OUT/mobile"
 mkdir -p "$OUT/desktop" "$OUT/mobile"
 # 16:9 for landscape screens
