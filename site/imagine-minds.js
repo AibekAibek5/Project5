@@ -11,9 +11,9 @@
   var BASE = script && script.src ? script.src.replace(/[^\/?#]*([?#].*)?$/, "") : "./";
 
   var DEFAULTS = {
-    frameCount: 203,          // frames/{desktop,mobile}/f0001.webp … f0203.webp (20 fps)
+    frameCount: 243,          // frames/{desktop,mobile}/f0001.webp … f0243.webp (24 fps)
     scrollLength: 6.9,        // height of the tour in screens (5.9 screens of scrolling)
-    introFrames: 30,          // climbing-net scene (first 1.5 s): loaded first
+    introFrames: 36,          // climbing-net scene (first 1.5 s): loaded first
     hideSquarespaceHeader: true,
     homeUrl: "/",
     // The tour only runs on these pages, so the snippet is safe even in the

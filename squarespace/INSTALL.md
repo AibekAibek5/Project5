@@ -46,7 +46,7 @@ Add any of these to `IMM_CONFIG`:
 | `homeUrl` | `"/"` | The page the logo links to. |
 | `tourPaths` | `["/"]` | Pages that show the tour. All other pages load normally, so the code is safe even in the site-wide header. |
 | `newTab` | `{ tickets: true }` | Which buttons open in a new tab, e.g. `{ tickets: true, party: true }`. |
-| `frameCount` | `203` | Number of frames. Change it only after re-extracting frames from a new video. |
+| `frameCount` | `243` | Number of frames. Change it only after re-extracting frames from a new video. |
 
 Example: change the caption text.
 
