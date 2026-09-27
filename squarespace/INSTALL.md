@@ -40,13 +40,13 @@ Add any of these to `IMM_CONFIG`:
 
 | Option | Default | What it does |
 |---|---|---|
-| `scrollLength` | `7` | Height of the tour in screens. Higher values play the video more slowly. |
+| `scrollLength` | `6.9` | Height of the tour in screens. Higher values play the video more slowly. |
 | `captions` | 6 scenes | The text over each scene. `from`/`to` are 0–1 positions through the video. |
 | `hideSquarespaceHeader` | `true` | Set to `false` to keep the Squarespace header. |
 | `homeUrl` | `"/"` | The page the logo links to. |
 | `tourPaths` | `["/"]` | Pages that show the tour. All other pages load normally, so the code is safe even in the site-wide header. |
 | `newTab` | `{ tickets: true }` | Which buttons open in a new tab, e.g. `{ tickets: true, party: true }`. |
-| `frameCount` | `309` | Number of frames. Change it only after re-extracting frames from a new video. |
+| `frameCount` | `304` | Number of frames. Change it only after re-extracting frames from a new video. |
 
 Example: change the caption text.
 

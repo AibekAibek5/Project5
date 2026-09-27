@@ -11,8 +11,8 @@
   var BASE = script && script.src ? script.src.replace(/[^\/?#]*([?#].*)?$/, "") : "./";
 
   var DEFAULTS = {
-    frameCount: 309,          // frames/{desktop,mobile}/f0001.webp … f0309.webp
-    scrollLength: 7,          // height of the tour in screens (6 screens of scrolling)
+    frameCount: 304,          // frames/{desktop,mobile}/f0001.webp … f0304.webp
+    scrollLength: 6.9,        // height of the tour in screens (5.9 screens of scrolling)
     hideSquarespaceHeader: true,
     homeUrl: "/",
     // The tour only runs on these pages, so the snippet is safe even in the
