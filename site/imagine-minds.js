@@ -13,6 +13,7 @@
   var DEFAULTS = {
     frameCount: 304,          // frames/{desktop,mobile}/f0001.webp … f0304.webp
     scrollLength: 6.9,        // height of the tour in screens (5.9 screens of scrolling)
+    introFrames: 45,          // climbing-net scene: higher-quality frames, loaded first
     hideSquarespaceHeader: true,
     homeUrl: "/",
     // The tour only runs on these pages, so the snippet is safe even in the
@@ -198,11 +199,16 @@
 
     function loadOrder() {
       var seen = new Uint8Array(N), order = [];
-      var strides = saveData ? [16, 8, 4, 2] : [16, 8, 4, 2, 1];
-      order.push(0); seen[0] = 1;
-      strides.forEach(function (s) {
-        for (var i = 0; i < N; i += s) if (!seen[i]) { seen[i] = 1; order.push(i); }
-      });
+      var add = function (from, to, step) {
+        for (var i = from; i < to; i += step) if (!seen[i]) { seen[i] = 1; order.push(i); }
+      };
+      // opening scene first so the first scroll is smooth, then coarse-to-fine for the rest
+      var intro = Math.min(cfg.introFrames, N);
+      add(0, 1, 1);
+      add(0, intro, 2);
+      add(0, N, 16);
+      if (!saveData) add(0, intro, 1);
+      (saveData ? [8, 4, 2] : [8, 4, 2, 1]).forEach(function (s) { add(0, N, s); });
       if (!seen[N - 1]) order.splice(1, 0, N - 1);
       return order;
     }
