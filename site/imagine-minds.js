@@ -15,6 +15,21 @@
     scrollLength: 6.9,        // height of the tour in screens (5.9 screens of scrolling)
     minVisible: 0.5,          // always show at least half of the frame (phones held upright)
     introFrames: 36,          // climbing-net scene (first 1.5 s): loaded first
+    // Phones held upright play a separate vertical video (frames/mobile, 720x1280).
+    // Its scenes land at different points, so it has its own caption timings;
+    // the caption text comes from `captions` below.
+    mobile: {
+      frameCount: 252,
+      introFrames: 38,
+      captions: [
+        { from: 0.02, to: 0.13 },
+        { from: 0.18, to: 0.32 },
+        { from: 0.36, to: 0.52 },
+        { from: 0.56, to: 0.71 },
+        { from: 0.76, to: 0.91 },
+        { from: 0.94, to: 0.995 }
+      ]
+    },
     hideSquarespaceHeader: true,
     homeUrl: "/",
     // The tour only runs on these pages, so the snippet is safe even in the
@@ -43,6 +58,7 @@
   var cfg = Object.assign({}, DEFAULTS, user);
   cfg.links = Object.assign({}, DEFAULTS.links, user.links || {});
   cfg.newTab = Object.assign({}, DEFAULTS.newTab, user.newTab || {});
+  cfg.mobile = Object.assign({}, DEFAULTS.mobile, user.mobile || {});
 
   var M = window.Motion || null;
   var reduceMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -195,9 +211,10 @@
     var saveData = !!(navigator.connection && navigator.connection.saveData);
 
     function pickSet() {
-      // phones (either orientation) get the lighter 960x540 set
-      return window.matchMedia("(max-width: 600px), (max-height: 500px)").matches ? "mobile" : "desktop";
+      // upright phones and tablets get the vertical video
+      return window.matchMedia("(orientation: portrait) and (max-width: 1024px)").matches ? "mobile" : "desktop";
     }
+    function opt(key) { return set === "mobile" && cfg.mobile[key] != null ? cfg.mobile[key] : cfg[key]; }
 
     function loadOrder() {
       var seen = new Uint8Array(N), order = [];
@@ -205,7 +222,7 @@
         for (var i = from; i < to; i += step) if (!seen[i]) { seen[i] = 1; order.push(i); }
       };
       // opening scene first so the first scroll is smooth, then coarse-to-fine for the rest
-      var intro = Math.min(cfg.introFrames, N);
+      var intro = Math.min(opt("introFrames"), N);
       add(0, 1, 1);
       add(0, intro, 2);
       add(0, N, 16);
@@ -218,6 +235,7 @@
     function startLoading() {
       var myGen = ++gen;
       set = pickSet();
+      N = opt("frameCount");
       frames = new Array(N);
       loadedCount = 0;
       var order = loadOrder(), total = order.length, next = 0, inflight = 0;
@@ -307,7 +325,7 @@
       var iw = img.naturalWidth, ih = img.naturalHeight;
       // fill the screen, but never crop away more than (1 - minVisible) of the frame
       var cover = Math.max(cw / iw, ch / ih);
-      var s = Math.min(cover, cw / (cfg.minVisible * iw), ch / (cfg.minVisible * ih));
+      var s = set === "mobile" ? cover : Math.min(cover, cw / (cfg.minVisible * iw), ch / (cfg.minVisible * ih));
       var dw = iw * s, dh = ih * s;
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
@@ -359,8 +377,9 @@
 
     function updateCaption() {
       var idx = -1;
-      for (var i = 0; i < cfg.captions.length; i++) {
-        if (progress >= cfg.captions[i].from && progress <= cfg.captions[i].to) { idx = i; break; }
+      var ranges = opt("captions");
+      for (var i = 0; i < ranges.length && i < caps.length; i++) {
+        if (progress >= ranges[i].from && progress <= ranges[i].to) { idx = i; break; }
       }
       if (idx === activeCap) return;
       if (activeCap > -1) hideCap(caps[activeCap]);
@@ -402,9 +421,11 @@
       if (resizeRaf) return;
       resizeRaf = requestAnimationFrame(function () {
         resizeRaf = 0;
-        if (pickSet() !== set) startLoading();
+        var switched = pickSet() !== set;   // rotated between upright and landscape: other video
+        if (switched) startLoading();
         resizeCanvas();
         measure();
+        if (switched) cur = target;
         kick();
       });
     }

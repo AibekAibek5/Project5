@@ -47,7 +47,7 @@ Add any of these to `IMM_CONFIG`:
 | `tourPaths` | `["/"]` | Pages that show the tour. All other pages load normally, so the code is safe even in the site-wide header. |
 | `newTab` | `{ tickets: true }` | Which buttons open in a new tab, e.g. `{ tickets: true, party: true }`. |
 | `frameCount` | `243` | Number of frames. Change it only after re-extracting frames from a new video. |
-| `minVisible` | `0.5` | Minimum share of each frame kept on screen. On upright phones the video fills about half the screen and fades into a blurred fill. |
+| `mobile` | vertical video | Upright phones play a separate 9:16 video with its own `frameCount` and caption timings, e.g. `mobile: { captions: [{ from: 0.02, to: 0.13 }, …] }`. |
 
 Example: change the caption text.
 
@@ -66,7 +66,7 @@ captions: [
 
 The snippet points at one exact commit (`@e8684fd…`), so it never changes by surprise. After changing anything in `site/`, push it, then swap the commit hash in both jsDelivr URLs in the snippet for the new one.
 
-To use a different video, run `scripts/extract-frames.sh your-video.mp4` (it needs ffmpeg), then set `frameCount` to the number it prints.
+To use different videos, run `scripts/extract-frames.sh wide.mp4 vertical.mp4` (it needs ffmpeg), then set `frameCount` and `mobile.frameCount` to the numbers it prints.
 
 ## Previewing locally
 
