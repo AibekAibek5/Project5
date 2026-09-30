@@ -12,6 +12,6 @@ mkdir -p "$OUT/desktop" "$OUT/mobile"
 ffmpeg -v error -i "$VIDEO" -vf "fps=$FPS,scale=1920:1080:flags=lanczos" \
   -c:v libwebp -quality 80 -compression_level 6 "$OUT/desktop/f%04d.webp"
 # lighter full frame for phones
-ffmpeg -v error -i "$VIDEO" -vf "fps=$FPS,scale=960:540:flags=lanczos" \
-  -c:v libwebp -quality 80 -compression_level 6 "$OUT/mobile/f%04d.webp"
+ffmpeg -v error -i "$VIDEO" -vf "fps=$FPS,scale=1280:720:flags=lanczos" \
+  -c:v libwebp -quality 78 -compression_level 6 "$OUT/mobile/f%04d.webp"
 echo "frameCount: $(ls "$OUT/desktop" | wc -l)"

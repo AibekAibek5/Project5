@@ -13,7 +13,7 @@
   var DEFAULTS = {
     frameCount: 243,          // frames/{desktop,mobile}/f0001.webp … f0243.webp (24 fps)
     scrollLength: 6.9,        // height of the tour in screens (5.9 screens of scrolling)
-    minVisible: 0.8,          // always show at least 80% of the frame's width and height
+    minVisible: 0.5,          // always show at least half of the frame (phones held upright)
     introFrames: 36,          // climbing-net scene (first 1.5 s): loaded first
     hideSquarespaceHeader: true,
     homeUrl: "/",
@@ -272,6 +272,24 @@
     var blurCanvas = document.createElement("canvas");
     blurCanvas.width = 32; blurCanvas.height = 18;
     var blurCtx = blurCanvas.getContext("2d");
+    var fadeCanvas = document.createElement("canvas");
+    var fadeCtx = fadeCanvas.getContext("2d");
+    var lastBlur = { x: 0, y: 0, w: 0, h: 0 };
+
+    // paints a strip of the blurred fill over the frame, fading from opaque (outer edge) to clear
+    function featherEdge(y, h, top) {
+      if (h < 2) return;
+      fadeCanvas.width = cw; fadeCanvas.height = h;
+      fadeCtx.globalCompositeOperation = "source-over";
+      fadeCtx.drawImage(blurCanvas, lastBlur.x, lastBlur.y - y, lastBlur.w, lastBlur.h);
+      var g = fadeCtx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, top ? "rgba(0,0,0,1)" : "rgba(0,0,0,0)");
+      g.addColorStop(1, top ? "rgba(0,0,0,0)" : "rgba(0,0,0,1)");
+      fadeCtx.globalCompositeOperation = "destination-in";
+      fadeCtx.fillStyle = g;
+      fadeCtx.fillRect(0, 0, cw, h);
+      ctx.drawImage(fadeCanvas, 0, y);
+    }
 
     function resizeCanvas() {
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -297,9 +315,17 @@
         // space around the frame (phones held upright): soft blurred copy of the same frame
         blurCtx.drawImage(img, 0, 0, blurCanvas.width, blurCanvas.height);
         var bs = cover * 1.08;
-        ctx.drawImage(blurCanvas, (cw - iw * bs) / 2, (ch - ih * bs) / 2, iw * bs, ih * bs);
+        lastBlur = { x: (cw - iw * bs) / 2, y: (ch - ih * bs) / 2, w: iw * bs, h: ih * bs };
+        ctx.drawImage(blurCanvas, lastBlur.x, lastBlur.y, lastBlur.w, lastBlur.h);
       }
-      ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+      var dx = (cw - dw) / 2, dy = (ch - dh) / 2;
+      ctx.drawImage(img, dx, dy, dw, dh);
+      if (s < cover && dy > 0) {
+        // feather the top and bottom edges into the blurred fill so it doesn't read as a slide
+        var f = Math.round(dh * 0.14);
+        featherEdge(dy, f, true);
+        featherEdge(dy + dh - f, f, false);
+      }
       drawn = i; drawnImg = img; needsDraw = false;
     }
 
