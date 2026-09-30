@@ -64,7 +64,7 @@ captions: [
 
 ## Updating the site later
 
-The snippet points at one exact commit (`@e8684fd…`), so it never changes by surprise. After changing anything in `site/`, push it, then swap the commit hash in both jsDelivr URLs in the snippet for the new one.
+The snippet points at one exact commit (`@1aadddc…`), so it never changes by surprise. After changing anything in `site/`, push it, then swap the commit hash in both jsDelivr URLs in the snippet for the new one.
 
 To use different videos, run `scripts/extract-frames.sh wide.mp4 vertical.mp4` (it needs ffmpeg), then set `frameCount` and `mobile.frameCount` to the numbers it prints.
 
