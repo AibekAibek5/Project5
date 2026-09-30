@@ -47,6 +47,7 @@ Add any of these to `IMM_CONFIG`:
 | `tourPaths` | `["/"]` | Pages that show the tour. All other pages load normally, so the code is safe even in the site-wide header. |
 | `newTab` | `{ tickets: true }` | Which buttons open in a new tab, e.g. `{ tickets: true, party: true }`. |
 | `frameCount` | `243` | Number of frames. Change it only after re-extracting frames from a new video. |
+| `minVisible` | `0.8` | Minimum share of each frame kept on screen. On phones the video becomes a band with a blurred fill around it. |
 
 Example: change the caption text.
 

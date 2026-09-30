@@ -13,6 +13,7 @@
   var DEFAULTS = {
     frameCount: 243,          // frames/{desktop,mobile}/f0001.webp … f0243.webp (24 fps)
     scrollLength: 6.9,        // height of the tour in screens (5.9 screens of scrolling)
+    minVisible: 0.8,          // always show at least 80% of the frame's width and height
     introFrames: 36,          // climbing-net scene (first 1.5 s): loaded first
     hideSquarespaceHeader: true,
     homeUrl: "/",
@@ -194,7 +195,8 @@
     var saveData = !!(navigator.connection && navigator.connection.saveData);
 
     function pickSet() {
-      return window.matchMedia("(orientation: portrait) and (max-width: 1024px)").matches ? "mobile" : "desktop";
+      // phones (either orientation) get the lighter 960x540 set
+      return window.matchMedia("(max-width: 600px), (max-height: 500px)").matches ? "mobile" : "desktop";
     }
 
     function loadOrder() {
@@ -266,6 +268,10 @@
 
     /* ---------- canvas ---------- */
     var cw = 0, ch = 0, drawn = -1, drawnImg = null, needsDraw = true;
+    // tiny canvas: drawing a frame at 32x18 and scaling it up gives a cheap blur that works in every browser
+    var blurCanvas = document.createElement("canvas");
+    blurCanvas.width = 32; blurCanvas.height = 18;
+    var blurCtx = blurCanvas.getContext("2d");
 
     function resizeCanvas() {
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -281,9 +287,18 @@
       var img = nearest(i);
       if (!img || (!needsDraw && i === drawn && img === drawnImg)) return;
       var iw = img.naturalWidth, ih = img.naturalHeight;
-      var s = Math.max(cw / iw, ch / ih), dw = iw * s, dh = ih * s;
+      // fill the screen, but never crop away more than (1 - minVisible) of the frame
+      var cover = Math.max(cw / iw, ch / ih);
+      var s = Math.min(cover, cw / (cfg.minVisible * iw), ch / (cfg.minVisible * ih));
+      var dw = iw * s, dh = ih * s;
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
+      if (s < cover) {
+        // space around the frame (phones held upright): soft blurred copy of the same frame
+        blurCtx.drawImage(img, 0, 0, blurCanvas.width, blurCanvas.height);
+        var bs = cover * 1.08;
+        ctx.drawImage(blurCanvas, (cw - iw * bs) / 2, (ch - ih * bs) / 2, iw * bs, ih * bs);
+      }
       ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
       drawn = i; drawnImg = img; needsDraw = false;
     }
